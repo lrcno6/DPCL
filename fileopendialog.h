@@ -12,25 +12,25 @@ namespace dpcl{
 			inline ShellItem get_result();
 			inline void show(Window* =nullptr);
 		protected:
-			CComPtr<IFileOpenDialog> m_dialog;
+			CComPtr<IFileOpenDialog> m_p;
 	};
 }
 dpcl::FileOpenDialog::FileOpenDialog(){
-	m_dialog=(IFileOpenDialog*)create(CLSID_FileOpenDialog,IID_IFileOpenDialog);
+	m_p=(IFileOpenDialog*)create(CLSID_FileOpenDialog,IID_IFileOpenDialog);
 }
 IFileOpenDialog* dpcl::FileOpenDialog::get_interface(){
-	return m_dialog;
+	return m_p;
 }
 dpcl::ShellItem dpcl::FileOpenDialog::get_result(){
 	using namespace std;
 	IShellItem *item;
-	if(FAILED(m_dialog->GetResult(&item)))
+	if(FAILED(m_p->GetResult(&item)))
 		throw string("Get Result Failed");
 	return item;
 }
 void dpcl::FileOpenDialog::show(Window *wnd){
 	using namespace std;
-	if(FAILED(m_dialog->Show(wnd?wnd->get_handle():nullptr)))
+	if(FAILED(m_p->Show(wnd?wnd->get_handle():nullptr)))
 		throw string("Show Dialog Failed");
 }
 #endif

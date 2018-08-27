@@ -14,10 +14,9 @@ namespace dpcl{
 			virtual IUnknown* get_interface()=0;
 		protected:
 			static int m_count;
-			static IUnknown* create(REFCLSID,REFIID);
+			inline static IUnknown* create(REFCLSID,REFIID);
 	};
 }
-int dpcl::COM::m_count=0;
 dpcl::COM::COM(){
 	using namespace std;
 	if(m_count++==0)

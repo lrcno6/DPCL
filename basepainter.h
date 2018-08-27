@@ -25,8 +25,6 @@ namespace dpcl{
 			ID2D1SolidColorBrush *m_brush;
 	};
 }
-int dpcl::Base_Painter::m_count=0;
-ID2D1Factory *dpcl::Base_Painter::m_factory=nullptr;
 dpcl::Base_Painter::Base_Painter():m_brush(nullptr){
 	using namespace std;
 	m_count++;

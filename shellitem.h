@@ -10,18 +10,18 @@ namespace dpcl{
 			inline virtual IShellItem* get_interface();
 			inline std::wstring get_name(SIGDN);
 		protected:
-			CComPtr<IShellItem> m_item;
+			CComPtr<IShellItem> m_p;
 	};
 }
-dpcl::ShellItem::ShellItem(IShellItem *inter):m_item(inter){}
+dpcl::ShellItem::ShellItem(IShellItem *inter):m_p(inter){}
 IShellItem* dpcl::ShellItem::get_interface(){
-	return m_item;
+	return m_p;
 }
 std::wstring dpcl::ShellItem::get_name(SIGDN sigdn){
 	using namespace std;
 	wchar_t *wstr;
 	wstring rwstr;
-	if(FAILED(m_item->GetDisplayName(sigdn,&wstr)))
+	if(FAILED(m_p->GetDisplayName(sigdn,&wstr)))
 		throw string("Get Display Name Failed");
 	rwstr=wstr;
 	CoTaskMemFree(wstr);

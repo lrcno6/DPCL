@@ -31,8 +31,6 @@ dpcl::Window::Painter::Painter(Painter &&other):Base_Painter((Base_Painter&&)oth
 }
 dpcl::Window::Painter::~Painter(){
 	end();
-	EndPaint(m_wnd->m_hwnd,&m_ps);
-	SafeRelease(&m_rt);
 }
 void dpcl::Window::Painter::make_brush(const D2D1_COLOR_F &color){
 	using namespace std;
@@ -47,9 +45,13 @@ void dpcl::Window::Painter::clear(const D2D1_COLOR_F &color){
 }
 void dpcl::Window::Painter::end(){
 	using namespace std;
-	HRESULT hr=m_rt->EndDraw();
-	if(FAILED(hr)||hr==D2DERR_RECREATE_TARGET)
-		throw string("Paint Failed");
+	if(m_rt){
+		HRESULT hr=m_rt->EndDraw();
+		if(FAILED(hr)||hr==D2DERR_RECREATE_TARGET)
+			throw string("Paint Failed");
+		EndPaint(m_wnd->m_hwnd,&m_ps);
+		SafeRelease(&m_rt);
+	}
 }
 D2D1_SIZE_F dpcl::Window::Painter::size(){
 	return m_rt->GetSize();

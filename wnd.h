@@ -1,3 +1,4 @@
+//Beta 3.1:fix some bugs
 #ifndef _WND_H_
 #define _WND_H_
 #include<string>
