@@ -8,7 +8,7 @@ namespace dpcl{
 			class Wndclass;
 			class Wndproc;
 			class Painter;
-			const Window *m_parent;
+			Window* const m_parent;
 			Wndclass &m_wc;
 			inline static Wndclass& wndclass();
 			inline Window(Window* =nullptr,Wndclass& =wndclass(),const std::string& ="Name",int=CW_USEDEFAULT,int=CW_USEDEFAULT,int=CW_USEDEFAULT,int=CW_USEDEFAULT,DWORD=0,DWORD=0,void* =nullptr,HMENU=nullptr);
