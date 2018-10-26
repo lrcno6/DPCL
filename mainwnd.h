@@ -1,40 +1,33 @@
-#ifndef _MAINWND_H_
-#define _MAINWND_H_
+#ifndef _MAIN_WND_H_
+#define _MAIN_WND_H_
 #include"wnd.h"
 namespace dpcl{
 	class MainWindow:public Window{
 		public:
-			inline static Wndclass& wndclass();
-			inline MainWindow(Window* =nullptr,Wndclass& =wndclass(),const std::string& ="Title",int=CW_USEDEFAULT,int=CW_USEDEFAULT,int=CW_USEDEFAULT,int=CW_USEDEFAULT,DWORD=0,DWORD=0,void* =nullptr,HMENU=nullptr);
-		protected:
-			inline static LRESULT CALLBACK wndproc(HWND,unsigned,WPARAM,LPARAM);
-	};
-}
-dpcl::Window::Wndclass& dpcl::MainWindow::wndclass(){
-	static Wndclass wc=[]{
-		Wndclass::Struct strt=Window::wndclass().m_struct;
-		strt.m_wc.lpszClassName="MainWindow";
-		strt.m_wc.lpfnWndProc=wndproc;
-		strt.m_style=WS_OVERLAPPEDWINDOW;
-		return Wndclass(strt);
-	}();
-	return wc;
-}
-dpcl::MainWindow::MainWindow(Window *parent,Wndclass &wc,const std::string &title,int x,int y,int w,int h,DWORD style,DWORD styleex,void *param,HMENU hmenu):Window(parent,wc,title,x,y,w,h,style,styleex,param,hmenu){}
-LRESULT CALLBACK dpcl::MainWindow::wndproc(HWND hwnd,unsigned msg,WPARAM wparam,LPARAM lparam){
-	switch(msg){
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			return 0;
-		case WM_PAINT:
-			{
-				PAINTSTRUCT ps;
-				HDC hdc=BeginPaint(hwnd,&ps);
-				FillRect(hdc,&ps.rcPaint,(HBRUSH)(COLOR_WINDOW+1));
-				EndPaint(hwnd,&ps);
+			MainWindow(const char *name,Application &app,int x=CW_USEDEFAULT,int y=CW_USEDEFAULT,int w=CW_USEDEFAULT,int h=CW_USEDEFAULT,Window *parent=nullptr,DWORD style=0,DWORD styleex=0){
+				static WNDCLASSEXA wc=[]{
+					WNDCLASSEXA wc={};
+					wc.cbSize=sizeof(WNDCLASSEXA);
+					wc.lpszClassName="MainWindow";
+					wc.lpfnWndProc=wndproc;
+					return wc;
+				}();
+				if(!m_registered){
+					wc.hInstance=app.handle();
+					Register(wc);
+				}
+				create(styleex,"MainWindow",name,style|WS_OVERLAPPEDWINDOW,x,y,w,h,parent,&app);
+				connect(WM_DESTROY,app,Application::quit);
+				connect(WM_PAINT,*this,MainWindow::paint);
 			}
-			return 0;
-	}
-	return DefWindowProcA(hwnd,msg,wparam,lparam);
+			virtual void paint(WPARAM,LPARAM){
+				PAINTSTRUCT ps;
+				HDC hdc=BeginPaint(m_hwnd,&ps);
+				FillRect(hdc,&ps.rcPaint,(HBRUSH)(COLOR_WINDOW+1));
+				EndPaint(m_hwnd,&ps);
+			}
+		private:
+			static bool m_registered;
+	};
 }
 #endif
