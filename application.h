@@ -24,10 +24,10 @@ namespace dpcl{
 		public:
 			Application(HINSTANCE hinstance,int cmd_show):m_hinstance(hinstance),m_cmd_show(cmd_show){}
 			int main(int,char**);
-			HINSTANCE handle()const{
+			HINSTANCE handle(){
 				return m_hinstance;
 			}
-			int message_loop()const{
+			int message_loop(){
 				MSG msg={};
 				while(GetMessageA(&msg,nullptr,0,0)){
 					TranslateMessage(&msg);

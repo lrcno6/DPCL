@@ -1,14 +1,13 @@
 #ifndef _WND_H_
 #define _WND_H_
 #include"application.h"
-#include"rand.h"
 namespace dpcl{
 	class Window:public Subject{
 		public:
-			HWND handle()const{
+			HWND handle(){
 				return m_hwnd;
 			}
-			void show(int cmd_show)const{
+			void show(int cmd_show){
 				if(m_hwnd==nullptr)
 					throw std::string("Window::show:invalid window object");
 				ShowWindow(m_hwnd,cmd_show);

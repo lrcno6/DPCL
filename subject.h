@@ -17,6 +17,7 @@ namespace dpcl{
 						delete j.second;
 			}
 			Subject& operator=(const Subject&)=delete;
+			Subject& operator=(Subject&&)=delete;
 			int64_t connect(unsigned msg,std::function<void(WPARAM,LPARAM)> func){
 				while(1){
 					int64_t atom=(uint64_t)Rand::rand()<<60|(uint64_t)Rand::rand()<<45|(uint64_t)Rand::rand()<<30|(uint64_t)Rand::rand()<<15|(uint64_t)Rand::rand();
@@ -47,7 +48,7 @@ namespace dpcl{
 				else
 					throw std::string("Subject::disconnect:not found");
 			}
-			void call(unsigned msg,WPARAM wparam,LPARAM lparam)const{
+			void call(unsigned msg,WPARAM wparam,LPARAM lparam){
 				try{
 					for(auto i:m_call_map.at(msg))
 						i.second->call(wparam,lparam);
