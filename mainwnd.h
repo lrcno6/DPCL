@@ -1,6 +1,7 @@
 #ifndef _MAIN_WND_H_
 #define _MAIN_WND_H_
 #include"wnd.h"
+#include"painting_factory.h"
 namespace dpcl{
 	class MainWindow:public Window{
 		public:
@@ -17,17 +18,21 @@ namespace dpcl{
 					Register(wc);
 				}
 				create(styleex,"MainWindow",name,style|WS_OVERLAPPEDWINDOW,x,y,w,h,parent,&app);
-				connect(WM_DESTROY,app,Application::quit);
-				connect(WM_PAINT,*this,MainWindow::paint);
+				connect(WM_DESTROY,app,&Application::quit);
+				connect(WM_PAINT,*this,&MainWindow::paint);
 			}
 			virtual void paint(WPARAM,LPARAM){
-				PAINTSTRUCT ps;
+				/*PAINTSTRUCT ps;
 				HDC hdc=BeginPaint(m_hwnd,&ps);
 				FillRect(hdc,&ps.rcPaint,(HBRUSH)(COLOR_WINDOW+1));
-				EndPaint(m_hwnd,&ps);
+				EndPaint(m_hwnd,&ps);*/
+				Painting *painting=m_factory.create(*this);
+				painting->clear(D2D1::ColorF(D2D1::ColorF::White));
+				delete painting;
 			}
-		private:
+		protected:
 			static bool m_registered;
+			static PaintingFactory m_factory;
 	};
 }
 #endif

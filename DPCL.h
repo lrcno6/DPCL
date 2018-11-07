@@ -3,7 +3,10 @@
 #include"application.h"
 #include"function.h"
 #include"mainwnd.h"
+#include"painting.h"
+#include"painting_factory.h"
 #include"rand.h"
 #include"subject.h"
 #include"wnd.h"
+#include"wndpainting.h"
 #endif
