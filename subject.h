@@ -18,9 +18,9 @@ namespace dpcl{
 			}
 			Subject& operator=(const Subject&)=delete;
 			Subject& operator=(Subject&&)=delete;
-			int64_t connect(unsigned msg,std::function<void(WPARAM,LPARAM)> func){
+			uint64_t connect(unsigned msg,std::function<void(WPARAM,LPARAM)> func){
 				while(1){
-					int64_t atom=(uint64_t)Rand::rand()<<60|(uint64_t)Rand::rand()<<45|(uint64_t)Rand::rand()<<30|(uint64_t)Rand::rand()<<15|(uint64_t)Rand::rand();
+					uint64_t atom=(uint64_t)Rand::rand()<<60|(uint64_t)Rand::rand()<<45|(uint64_t)Rand::rand()<<30|(uint64_t)Rand::rand()<<15|(uint64_t)Rand::rand();
 					if(!m_msg_map.count(atom)){
 						m_msg_map[atom]=msg;
 						m_call_map[msg][atom]=new Function(func);
@@ -29,9 +29,9 @@ namespace dpcl{
 				}
 			}
 			template<class type>
-			int64_t connect(unsigned msg,type &obj,void (type::*method)(WPARAM,LPARAM)){
+			uint64_t connect(unsigned msg,type &obj,void (type::*method)(WPARAM,LPARAM)){
 				while(1){
-					int64_t atom=(uint64_t)Rand::rand()<<60|(uint64_t)Rand::rand()<<45|(uint64_t)Rand::rand()<<30|(uint64_t)Rand::rand()<<15|(uint64_t)Rand::rand();
+					uint64_t atom=(uint64_t)Rand::rand()<<60|(uint64_t)Rand::rand()<<45|(uint64_t)Rand::rand()<<30|(uint64_t)Rand::rand()<<15|(uint64_t)Rand::rand();
 					if(!m_msg_map.count(atom)){
 						m_msg_map[atom]=msg;
 						m_call_map[msg][atom]=new Method<type>(obj,method);
@@ -39,7 +39,7 @@ namespace dpcl{
 					}
 				}
 			}
-			void disconnect(int64_t atom){
+			void disconnect(uint64_t atom){
 				if(m_msg_map.count(atom)){
 					delete m_call_map[m_msg_map[atom]][atom];
 					m_call_map[m_msg_map[atom]].erase(atom);
@@ -84,8 +84,8 @@ namespace dpcl{
 					type &m_obj;
 					void (type::*m_method)(WPARAM,LPARAM);
 			};
-			std::map<unsigned,std::map<int64_t,Callable*>> m_call_map;
-			std::map<int64_t,unsigned> m_msg_map;
+			std::map<unsigned,std::map<uint64_t,Callable*>> m_call_map;
+			std::map<uint64_t,unsigned> m_msg_map;
 	};
 }
 #endif

@@ -1,12 +1,10 @@
-## DPCL Beta 3.1
+## DPCL Alpha 4.3
 
-Beta 3.1:fix some bugs on beta 3.0
-
-I realized that it is not easy to write a *README* file.
+Alpha 4.3:for *Observer*
 
 I have a poor English,so some of the sentences are translated by *Google Translate*.So maybe some sentences have grammatical errors.
 
-As the name implies,DPCL(Desktop Programming Class Library) is a class library for desktop programming.
+As the name implies,*DPCL*(*Desktop Programming Class Library*) is a class library for desktop programming.
 
 -----
 
@@ -14,29 +12,32 @@ GitHub address: https://github.com/lrcno6/DPCL
 
 -----
 
-### About the Version
-
-In Beta 2.0,the desktop programming by DPCL is just like the Win32 programming.But in beta 3.0,we rewrite the entire class library,and make it more like *Qt* programming.However,the core functionality has not changed much.
-
-### How to Use it
-
-DPCL is a static library,although lots of functions are inlined.
-
-To use DPCL,you need to compile the source *var.cpp* and create a static library named *DPCL.lib*(or *DPCL.a* or others).Because there are `#pragma comment(lib,"DPCL")` in header *DPCL.h*.
-
-### Note
-
-1. Use it by a single thread.If you need to use it with multiple threads,you should change something,or it will have lots of bugs.
-2. All classes and functions are in namespace *dpcl*
-
-### Wiki
-
-see file *wiki.md*(no link)
+License:*LGPL v3.0*
 
 -----
 
-Finally,I hope that everyone can help me and improve *DPCL*.
+### About the Version
 
-We do,together!
+In this version,we rewrote the entire class library again,and make it more like *Qt* programming - to make the object subject(see [Observer](https://en.wikipedia.org/wiki/Observer_pattern)).However,the other core functionalities have not changed much.
+
+### How to Use it
+
+DPCL is a static library.If you are using Visual Studio,you can use nmake - there is a *makefile* for it.If not,please compile all the cpp source and make a static library.
+
+You need not to add to link *d2d1.lib* please we add `#pragma comment(lib,"d2d1")` in *DPCL.h*.But you need to link *DPCL.lib* by yourself because we deleted the `#pragma comment(lib,"DPCL")` in *DPCL.h*
+
+If you cannot find *D2D1CreateFactory* or others while you compile,maybe you also need to link d2d1.lib(I do not know why).
+
+### Note
+
+All classes and functions are in namespace *dpcl*
+
+### Wiki
+
+see file *wiki.md*
+
+-----
+
+I hope that more people can improve *DPCL*.
 
 by *EnderPearl*

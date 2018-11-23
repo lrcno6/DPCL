@@ -9,4 +9,5 @@
 #include"subject.h"
 #include"wnd.h"
 #include"wndpainting.h"
+#pragma comment(lib,"d2d1")
 #endif
