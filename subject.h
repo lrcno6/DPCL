@@ -48,12 +48,16 @@ namespace dpcl{
 				else
 					throw std::string("Subject::disconnect:not found");
 			}
-			void call(unsigned msg,WPARAM wparam,LPARAM lparam){
+			bool call(unsigned msg,WPARAM wparam,LPARAM lparam){
+				bool b=false;
 				try{
-					for(auto i:m_call_map.at(msg))
+					for(auto i:m_call_map.at(msg)){
 						i.second->call(wparam,lparam);
+						b=true;
+					}
 				}
 				catch(std::out_of_range&){}
+				return b;
 			}
 		private:
 			class Callable{

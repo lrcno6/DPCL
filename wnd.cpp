@@ -8,7 +8,8 @@ LRESULT CALLBACK Window::wndproc(HWND hwnd,unsigned msg,WPARAM wparam,LPARAM lpa
 	}
 	else
 		p=(Window*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+	bool def=true;
 	if(p)
-		p->call(msg,wparam,lparam);
-	return DefWindowProc(hwnd,msg,wparam,lparam);
+		def=!p->call(msg,wparam,lparam);
+	return def?DefWindowProc(hwnd,msg,wparam,lparam):0;
 }
