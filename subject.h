@@ -1,95 +1,108 @@
 #ifndef _SUBJECT_H_
 #define _SUBJECT_H_
-#include<string>
-#include<map>
 #include<set>
+#include<map>
 #include<functional>
-#include<windows.h>
-#include"rand.h"
+#include<thread>
+#include<mutex>
+#include<utility>
+#include<cstdint>
+#include"baseargument.h"
 namespace dpcl{
 	class Subject{
 		public:
+			mutex m_mutex;
 			Subject()=default;
 			Subject(const Subject&)=delete;
+			Subject(Subject&&)=default;
 			virtual ~Subject(){
-				for(auto i:m_call_map)
-					for(auto j:i.second)
-						delete j.second;
+				using namespace std;
+				lock_guard<mutex> lock(m_mutex);
+				for(auto i:m_atom_map)
+					delete i.second.first;
 			}
 			Subject& operator=(const Subject&)=delete;
 			Subject& operator=(Subject&&)=delete;
-			uint64_t connect(unsigned msg,std::function<void(WPARAM,LPARAM)> func){
+			template<typename return_type>
+			uint64_t connect(uint32_t Signal,const std::function<return_type(const BaseArgument&)> &func){
 				while(1){
-					uint64_t atom=(uint64_t)Rand::rand()<<60|(uint64_t)Rand::rand()<<45|(uint64_t)Rand::rand()<<30|(uint64_t)Rand::rand()<<15|(uint64_t)Rand::rand();
-					if(!m_msg_map.count(atom)){
-						m_msg_map[atom]=msg;
-						m_call_map[msg][atom]=new Function(func);
+					uint64_t atom=(uint64_t)rand()<<60^(uint64_t)rand()<<45^rand()<<30^rand()<<15^rand();
+					if(!m_atom_map.count(atom)){
+						m_atom_map[atom]=std::pair(new Function(func),atom);
+						m_signal_map[Signal].insert(atom);
 						return atom;
 					}
 				}
 			}
-			template<class type>
-			uint64_t connect(unsigned msg,type &obj,void (type::*method)(WPARAM,LPARAM)){
+			template<class type,typename return_type>
+			uint64_t connect(uint32_t Signal,type &obj,return_type(type::*method)(const BaseArgument&)){
 				while(1){
-					uint64_t atom=(uint64_t)Rand::rand()<<60|(uint64_t)Rand::rand()<<45|(uint64_t)Rand::rand()<<30|(uint64_t)Rand::rand()<<15|(uint64_t)Rand::rand();
-					if(!m_msg_map.count(atom)){
-						m_msg_map[atom]=msg;
-						m_call_map[msg][atom]=new Method<type>(obj,method);
+					uint64_t atom=(uint64_t)rand()<<60^(uint64_t)rand()<<45^rand()<<30^rand()<<15^rand();
+					if(!m_atom_map.count(atom)){
+						m_atom_map[atom]=std::pair(new Method(obj,method),atom);
+						m_signal_map[Signal].insert(atom);
 						return atom;
 					}
 				}
 			}
-			void disconnect(uint64_t atom){
-				if(m_msg_map.count(atom)){
-					delete m_call_map[m_msg_map[atom]][atom];
-					m_call_map[m_msg_map[atom]].erase(atom);
-					m_msg_map.erase(atom);
+			bool disconnect(uint64_t atom){
+				if(m_atom_map.count(atom)){
+					m_signal_map[m_atom_map[atom].second].erase(atom);
+					delete m_atom_map[atom].first;
+					m_atom_map.erase(atom);
+					return true;
 				}
 				else
-					throw std::string("Subject::disconnect:not found");
+					return false;
 			}
-			bool call(unsigned msg,WPARAM wparam,LPARAM lparam){
-				bool b=false;
-				try{
-					for(auto i:m_call_map.at(msg)){
-						i.second->call(wparam,lparam);
-						b=true;
+			// it will call the functions/methods serially
+			void call(uint32_t Signal,const BaseArgument &arg){
+				if(m_signal_map.count(Signal))
+					for(auto i:m_signal_map[Signal])
+						m_atom_map[i].first->call(arg);
+			}
+			// it will call the functions/methods in parallel
+			void call_in_parallel(uint32_t Signal,const BaseArgument &arg){
+				if(m_signal_map.count(Signal))
+					for(auto i:m_signal_map[Signal]){
+						std::thread T()
 					}
-				}
-				catch(std::out_of_range&){}
-				return b;
+						//m_atom_map[i].first->call(arg);
 			}
 		private:
 			class Callable{
 				public:
 					Callable()=default;
 					Callable(const Callable&)=delete;
+					Callable(Callable&&)=default;
 					virtual ~Callable()=default;
 					Callable& operator=(const Callable&)=delete;
-					virtual void call(WPARAM,LPARAM)const=0;
+					Callable& operator=(Callable&&)=delete;
+					virtual void call(const BaseArgument&)const=0;
 			};
+			template<typename return_type>
 			class Function:public Callable{
 				public:
-					Function(std::function<void(WPARAM,LPARAM)> func):m_func(func){}
-					virtual void call(WPARAM wparam,LPARAM lparam)const{
-						m_func(wparam,lparam);
+					Function(const std::function<return_type(const BaseArgument&)> &func):m_func(func){}
+					void call(const BaseArgument &arg)const{
+						m_func(arg);
 					}
 				private:
-					std::function<void(WPARAM,LPARAM)> m_func;
+					std::function<return_type(const BaseArgument&)> m_func;
 			};
-			template<class type>
+			template<class type,typename return_type>
 			class Method:public Callable{
 				public:
-					Method(type &obj,void (type::*method)(WPARAM,LPARAM)):m_obj(obj),m_method(method){}
-					virtual void call(WPARAM wparam,LPARAM lparam)const{
-						(m_obj.*m_method)(wparam,lparam);
+					Method(type &obj,void (type::*method)(const BaseArgument&)):m_obj(obj),m_method(method){}
+					virtual void call(const BaseArgument &arg)const{
+						(m_obj.*m_method)(arg);
 					}
 				private:
 					type &m_obj;
-					void (type::*m_method)(WPARAM,LPARAM);
+					void (type::*m_method)(const BaseArgument&);
 			};
-			std::map<unsigned,std::map<uint64_t,Callable*>> m_call_map;
-			std::map<uint64_t,unsigned> m_msg_map;
+			std::map<uint64_t,std::pair<Callable*,uint32_t>> m_atom_map;
+			std::map<uint32_t,set<uint64_t>> m_signal_map;
 	};
 }
 #endif
